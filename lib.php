@@ -21,6 +21,16 @@ function local_prompt_tarea_coursemodule_standard_elements($formwrapper, $mform)
     $mform->setType('prompt_tarea_text', PARAM_TEXT);
     $mform->addHelpButton('prompt_tarea_text', 'promptlabel', 'local_prompt_tarea');
     
+    // Sección: Prompt para el Estudiante
+    $mform->addElement('header', 'promptestudianteheader', get_string('promptestudianteheader', 'local_prompt_tarea'));
+    
+    $mform->addElement('textarea', 'prompt_estudiante_text', 
+                       get_string('promptestudiantelabel', 'local_prompt_tarea'),
+                       'wrap="virtual" rows="10" cols="50"');
+    
+    $mform->setType('prompt_estudiante_text', PARAM_TEXT);
+    $mform->addHelpButton('prompt_estudiante_text', 'promptestudiantelabel', 'local_prompt_tarea');
+    
     // Cargar datos existentes si estamos editando
     if (isset($formwrapper->get_current()->instance) && $formwrapper->get_current()->instance) {
         try {
@@ -34,6 +44,7 @@ function local_prompt_tarea_coursemodule_standard_elements($formwrapper, $mform)
                 $record = $DB->get_record('local_prompt_tarea', ['assignid' => $assignid]);
                 if ($record) {
                     $mform->setDefault('prompt_tarea_text', $record->prompt);
+                    $mform->setDefault('prompt_estudiante_text', $record->prompt_estudiante);
                 }
             }
         } catch (Exception $e) {
@@ -63,7 +74,7 @@ function local_prompt_tarea_coursemodule_edit_post_actions($data, $course) {
         return $data;
     }
     
-    if (isset($data->prompt_tarea_text)) {
+    if (isset($data->prompt_tarea_text) || isset($data->prompt_estudiante_text)) {
         $time = time();
         
         try {
@@ -72,14 +83,16 @@ function local_prompt_tarea_coursemodule_edit_post_actions($data, $course) {
             
             if ($record) {
                 // Actualizar
-                $record->prompt = $data->prompt_tarea_text;
+                $record->prompt = $data->prompt_tarea_text ?? $record->prompt;
+                $record->prompt_estudiante = $data->prompt_estudiante_text ?? $record->prompt_estudiante;
                 $record->timemodified = $time;
                 $DB->update_record('local_prompt_tarea', $record);
             } else {
                 // Crear nuevo
                 $record = new stdClass();
                 $record->assignid = $data->instance;
-                $record->prompt = $data->prompt_tarea_text;
+                $record->prompt = $data->prompt_tarea_text ?? '';
+                $record->prompt_estudiante = $data->prompt_estudiante_text ?? '';
                 $record->timecreated = $time;
                 $record->timemodified = $time;
                 $DB->insert_record('local_prompt_tarea', $record);
