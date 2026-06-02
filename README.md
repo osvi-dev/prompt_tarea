@@ -91,8 +91,6 @@ Profesor edita tarea → local_prompt_tarea guarda ambos prompts
 Profesor califica entrega → assignfeedback_aiprompt lee el prompt del profesor
                               ↓
                      IA genera feedback personalizado
-
-Estudiante ve la tarea  → Se puede mostrar el prompt del estudiante
 ```
 
 ---
